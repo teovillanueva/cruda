@@ -3,6 +3,7 @@ import { getRecentPhotos, getPhotoById } from "@/lib/queries";
 import { getSessionUser } from "@/lib/session";
 import { db } from "@/lib/db";
 import { photo } from "@/schema/platform";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -50,6 +51,13 @@ export async function POST(request: NextRequest) {
   });
 
   const created = await getPhotoById(id, user.id);
+
+  const posthog = getPostHogClient();
+  posthog.capture({
+    distinctId: user.id,
+    event: "photo_created",
+    properties: { photo_id: id, has_title: !!title, has_description: !!description },
+  });
 
   return NextResponse.json(created, { status: 201 });
 }

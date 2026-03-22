@@ -8,6 +8,7 @@ import { FloatingBar } from "@/components/floating-bar";
 import { AuthQuote } from "@/components/auth-quote";
 import { authClient } from "@/lib/auth-client";
 import { Logo } from "@/components/logo";
+import posthog from "posthog-js";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -31,6 +32,8 @@ export default function LoginPage() {
       setError(error.message ?? "error al iniciar sesión");
       setLoading(false);
     } else {
+      posthog.identify(email, { email });
+      posthog.capture("user_signed_in", { email });
       router.push("/");
       router.refresh();
     }

@@ -4,6 +4,7 @@ import { getPhotoById } from "@/lib/queries";
 import { getSessionUser } from "@/lib/session";
 import { db } from "@/lib/db";
 import { photo } from "@/schema/platform";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 export async function GET(
   _request: Request,
@@ -58,6 +59,13 @@ export async function PATCH(
   }
 
   const updated = await getPhotoById(id, user.id);
+
+  const posthog = getPostHogClient();
+  posthog.capture({
+    distinctId: user.id,
+    event: "photo_metadata_updated",
+    properties: { photo_id: id, updated_fields: Object.keys(updates) },
+  });
 
   return NextResponse.json(updated);
 }

@@ -6,6 +6,7 @@ import { useUser } from "@/lib/hooks/use-user";
 import { FloatingBar } from "@/components/floating-bar";
 import { BackLink } from "@/components/back-link";
 import { useAuth } from "@/lib/auth-context";
+import posthog from "posthog-js";
 
 export type ProfileTab = "fotos" | "guardadas";
 
@@ -64,7 +65,13 @@ export function ProfileBar({
       ) : currentUser && !isOwnProfile ? (
         <>
           <button
-            onClick={() => followToggle.mutate(userId)}
+            onClick={() => {
+              followToggle.mutate(userId, {
+                onSuccess: (data) => {
+                  posthog.capture(data.followed ? "user_followed" : "user_unfollowed", { followed_user_id: userId, followed_username: username });
+                },
+              });
+            }}
             className={`text-sm whitespace-nowrap transition-colors ${
               followed
                 ? "text-foreground"

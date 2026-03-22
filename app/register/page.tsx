@@ -8,6 +8,7 @@ import { FloatingBar } from "@/components/floating-bar";
 import { AuthQuote } from "@/components/auth-quote";
 import { authClient } from "@/lib/auth-client";
 import { Logo } from "@/components/logo";
+import posthog from "posthog-js";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -34,6 +35,8 @@ export default function RegisterPage() {
       setError(error.message ?? "error al crear cuenta");
       setLoading(false);
     } else {
+      posthog.identify(email, { email, name, username });
+      posthog.capture("user_signed_up", { email, name, username });
       router.push("/philosophy");
       router.refresh();
     }

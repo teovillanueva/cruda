@@ -10,6 +10,7 @@ import { BackLink } from "@/components/back-link";
 import { UploadZone } from "@/components/upload-zone";
 import { useUploadPhoto } from "@/lib/hooks/use-upload";
 import { useAuth } from "@/lib/auth-context";
+import posthog from "posthog-js";
 
 interface FileEntry {
   file: File;
@@ -74,6 +75,7 @@ export default function UploadPage() {
   };
 
   const handleUpload = async () => {
+    posthog.capture("photo_upload_started", { photo_count: entries.length });
     setUploading(true);
 
     // Mark all pending as uploading

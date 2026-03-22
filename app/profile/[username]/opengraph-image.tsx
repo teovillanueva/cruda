@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { getUserByUsername, getPhotosByUser } from "@/lib/queries";
+import { getUserByUsername } from "@/lib/queries";
 
 export const alt = "cruda";
 export const size = {
@@ -36,8 +36,6 @@ export default async function Image({
     );
   }
 
-  const { photos } = await getPhotosByUser(profile.id);
-
   const font = await fetch(
     "https://fonts.gstatic.com/s/sourceserif4/v14/vEFy2_tTDB4M7-auWDN0ahZJW3IX2ih5nk3AucvUHf6OAVIJmeUDygwjiklqrhw.ttf"
   ).then((res) => res.arrayBuffer());
@@ -55,55 +53,57 @@ export default async function Image({
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between",
+          alignItems: "center",
+          justifyContent: "center",
           fontFamily: "Source Serif 4",
-          padding: "60px 80px",
+          gap: 24,
         }}
       >
+        <svg
+          width={42}
+          height={60}
+          viewBox="0 0 70 100"
+          fill="#ededed"
+        >
+          <path d="M35 0 C36 36, 44 46, 70 50 C44 54, 36 64, 35 100 C34 64, 26 54, 0 50 C26 46, 34 36, 35 0Z" />
+        </svg>
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: 16,
+            alignItems: "center",
+            gap: 12,
           }}
         >
           <span
             style={{
-              fontSize: 52,
+              fontSize: 72,
               color: "#ededed",
+              fontStyle: "italic",
             }}
           >
-            {profile.name}
+            cruda
           </span>
           <span
             style={{
               fontSize: 28,
               color: "#ededed",
               opacity: 0.6,
-              fontStyle: "italic",
             }}
           >
-            @{profile.username}
+            {profile.name}
           </span>
           <span
             style={{
               fontSize: 24,
               color: "#ededed",
               opacity: 0.4,
+              fontStyle: "italic",
             }}
           >
-            {photos.length} {photos.length === 1 ? "foto" : "fotos"} en cruda
+            @{profile.username}
           </span>
         </div>
-        <svg
-          width={21}
-          height={30}
-          viewBox="0 0 70 100"
-          fill="#ededed"
-          opacity={0.3}
-        >
-          <path d="M35 0 C36 36, 44 46, 70 50 C44 54, 36 64, 35 100 C34 64, 26 54, 0 50 C26 46, 34 36, 35 0Z" />
-        </svg>
       </div>
     ),
     {

@@ -10,6 +10,7 @@ import { FloatingBar } from "@/components/floating-bar";
 import { BackLink } from "@/components/back-link";
 import { ConfirmModal } from "@/components/confirm-modal";
 import { useAuth } from "@/lib/auth-context";
+import posthog from "posthog-js";
 
 export function PhotoBar({ photoId }: { photoId: string }) {
   const { user } = useAuth();
@@ -47,7 +48,13 @@ export function PhotoBar({ photoId }: { photoId: string }) {
               </>
             ) : (
               <button
-                onClick={() => saveToggle.mutate(photoId)}
+                onClick={() => {
+                  saveToggle.mutate(photoId, {
+                    onSuccess: (data) => {
+                      posthog.capture(data.saved ? "photo_saved" : "photo_unsaved", { photo_id: photoId });
+                    },
+                  });
+                }}
                 className={`text-sm whitespace-nowrap transition-colors ${
                   saved
                     ? "text-foreground"
@@ -77,6 +84,7 @@ export function PhotoBar({ photoId }: { photoId: string }) {
         onConfirm={() => {
           deletePhoto.mutate(photoId, {
             onSuccess: () => {
+              posthog.capture("photo_deleted", { photo_id: photoId });
               setDeleteOpen(false);
               router.push(`/profile/${user!.username}`);
             },

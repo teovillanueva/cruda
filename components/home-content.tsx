@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { HomeBar, type HomeTab } from "@/components/home-bar";
 import { VirtualMasonryGrid } from "@/components/virtual-masonry-grid";
 import { EmptyState } from "@/components/empty-state";
+import { Logo } from "@/components/logo";
 import {
   usePhotos,
   useRandomPhotos,
@@ -41,7 +43,18 @@ export function HomeContent() {
 
   return (
     <>
-      <div className="px-1 pt-1 pb-24">
+      <header className="flex items-center justify-between px-4 h-12">
+        <Link href="/">
+          <Logo size={16} />
+        </Link>
+        <Link
+          href="/mas"
+          className="text-sm text-foreground/60 hover:text-foreground transition-colors"
+        >
+          más
+        </Link>
+      </header>
+      <div className="px-1 pb-24">
         {photos.length === 0 && !isFetchingNextPage ? (
           <EmptyState message="no hay fotos todavía" />
         ) : (
