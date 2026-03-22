@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  type ReactNode,
+} from "react";
+import { useRouter } from "next/navigation";
+import { authClient } from "./auth-client";
 import type { User } from "./mock-data";
 
 interface AuthContextValue {
@@ -11,13 +17,29 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const MOCK_USER: User = { username: "anagarcia", name: "Ana García" };
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const { data: session, isPending } = authClient.useSession();
+  const router = useRouter();
 
-  const login = () => setUser(MOCK_USER);
-  const logout = () => setUser(null);
+  const user: User | null =
+    session?.user
+      ? {
+          username: (session.user as { username?: string }).username ?? session.user.name,
+          name: session.user.name,
+        }
+      : null;
+
+  const login = () => router.push("/login");
+
+  const logout = async () => {
+    await authClient.signOut();
+    router.push("/");
+    router.refresh();
+  };
+
+  if (isPending) {
+    return null;
+  }
 
   return (
     <AuthContext value={{ user, login, logout }}>

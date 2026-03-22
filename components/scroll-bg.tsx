@@ -1,9 +1,17 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
+
+const disabledPaths = ["/login", "/register", "/recover", "/confirm-email", "/philosophy"];
 
 export function ScrollBackground() {
+  const pathname = usePathname();
+  const disabled = disabledPaths.includes(pathname);
+
   useEffect(() => {
+    if (disabled) return;
+
     let timeout: ReturnType<typeof setTimeout>;
 
     const handleScroll = () => {
@@ -18,8 +26,9 @@ export function ScrollBackground() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
       clearTimeout(timeout);
+      document.documentElement.classList.remove("is-scrolling");
     };
-  }, []);
+  }, [disabled]);
 
   return null;
 }
