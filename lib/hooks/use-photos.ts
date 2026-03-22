@@ -48,3 +48,4 @@ export function useSavedPhotos() {
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   });
 }
+

@@ -2,7 +2,7 @@
 
 :root {
   --background: #fafafa;
-  --background-scroll: #ededed;
+  --background-scroll: #f3f3f3;
   --foreground: #1a1a1a;
   --muted: #999;
   --border: #e5e5e5;
@@ -91,10 +91,14 @@ body {
 
 /* Modal animations */
 @keyframes modal-overlay-in {
-  from { opacity: 0; }
+  from {
+    opacity: 0;
+  }
 }
 @keyframes modal-overlay-out {
-  to { opacity: 0; }
+  to {
+    opacity: 0;
+  }
 }
 @keyframes modal-content-in {
   from {
@@ -106,6 +110,15 @@ body {
   to {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.96);
+  }
+}
+
+/* Prevent iOS Safari auto-zoom on input focus */
+@supports (-webkit-touch-callout: none) {
+  input,
+  textarea,
+  select {
+    font-size: 16px;
   }
 }
 

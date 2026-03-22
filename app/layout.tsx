@@ -15,6 +15,20 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://cruda.app"),
   title: "cruda",
   description: "fotografía en estado puro",
+  icons: {
+    icon: [
+      {
+        url: "/favicon-dark.svg",
+        media: "(prefers-color-scheme: light)",
+      },
+      {
+        url: "/favicon-light.svg",
+        media: "(prefers-color-scheme: dark)",
+      },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
