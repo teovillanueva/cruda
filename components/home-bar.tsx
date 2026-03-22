@@ -3,9 +3,8 @@
 import Link from "next/link";
 import { FloatingBar } from "./floating-bar";
 import { useAuth } from "@/lib/auth-context";
-import { useSocial } from "@/lib/social-context";
 
-export type HomeTab = "recientes" | "trending" | "guardadas";
+export type HomeTab = "recientes" | "random" | "feed";
 
 export function HomeBar({
   tab,
@@ -15,9 +14,6 @@ export function HomeBar({
   onTabChange: (tab: HomeTab) => void;
 }) {
   const { user } = useAuth();
-  const { savedPhotoIds } = useSocial();
-
-  const showGuardadas = !!user && savedPhotoIds.size > 0;
 
   return (
     <FloatingBar>
@@ -32,23 +28,23 @@ export function HomeBar({
         </button>
         <span className="text-foreground/30">/</span>
         <button
-          onClick={() => onTabChange("trending")}
+          onClick={() => onTabChange("random")}
           className={`transition-colors ${
-            tab === "trending" ? "text-foreground" : "text-foreground/40"
+            tab === "random" ? "text-foreground" : "text-foreground/40"
           }`}
         >
-          trending
+          random
         </button>
-        {showGuardadas && (
+        {user && (
           <>
             <span className="text-foreground/30">/</span>
             <button
-              onClick={() => onTabChange("guardadas")}
+              onClick={() => onTabChange("feed")}
               className={`transition-colors ${
-                tab === "guardadas" ? "text-foreground" : "text-foreground/40"
+                tab === "feed" ? "text-foreground" : "text-foreground/40"
               }`}
             >
-              guardadas
+              feed
             </button>
           </>
         )}

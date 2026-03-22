@@ -89,6 +89,26 @@ body {
   }
 }
 
+/* Modal animations */
+@keyframes modal-overlay-in {
+  from { opacity: 0; }
+}
+@keyframes modal-overlay-out {
+  to { opacity: 0; }
+}
+@keyframes modal-content-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+}
+@keyframes modal-content-out {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(*),
   ::view-transition-new(*) {

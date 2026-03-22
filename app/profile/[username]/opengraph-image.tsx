@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { getUserByUsername, getPhotosByUsername } from "@/lib/mock-data";
+import { getUserByUsername, getPhotosByUser } from "@/lib/queries";
 
 export const alt = "cruda";
 export const size = {
@@ -14,9 +14,9 @@ export default async function Image({
   params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
-  const user = getUserByUsername(username);
+  const profile = await getUserByUsername(username);
 
-  if (!user) {
+  if (!profile) {
     return new ImageResponse(
       (
         <div
@@ -36,7 +36,7 @@ export default async function Image({
     );
   }
 
-  const photos = getPhotosByUsername(username);
+  const { photos } = await getPhotosByUser(profile.id);
 
   const font = await fetch(
     "https://fonts.gstatic.com/s/sourceserif4/v14/vEFy2_tTDB4M7-auWDN0ahZJW3IX2ih5nk3AucvUHf6OAVIJmeUDygwjiklqrhw.ttf"
@@ -73,7 +73,7 @@ export default async function Image({
               color: "#ededed",
             }}
           >
-            {user.name}
+            {profile.name}
           </span>
           <span
             style={{
@@ -83,7 +83,7 @@ export default async function Image({
               fontStyle: "italic",
             }}
           >
-            @{user.username}
+            @{profile.username}
           </span>
           <span
             style={{
@@ -95,16 +95,15 @@ export default async function Image({
             {photos.length} {photos.length === 1 ? "foto" : "fotos"} en cruda
           </span>
         </div>
-        <span
-          style={{
-            fontSize: 28,
-            color: "#ededed",
-            opacity: 0.3,
-            fontStyle: "italic",
-          }}
+        <svg
+          width={21}
+          height={30}
+          viewBox="0 0 70 100"
+          fill="#ededed"
+          opacity={0.3}
         >
-          cruda
-        </span>
+          <path d="M35 0 C36 36, 44 46, 70 50 C44 54, 36 64, 35 100 C34 64, 26 54, 0 50 C26 46, 34 36, 35 0Z" />
+        </svg>
       </div>
     ),
     {

@@ -3,16 +3,11 @@ import { ViewTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { photos, getPhotoUrl, getPhotoById } from "@/lib/mock-data";
+import { getPhotoById, getRecentPhotos } from "@/lib/queries";
+import { getSessionUser } from "@/lib/session";
 import { BlurImage } from "@/components/blur-image";
 import { PhotoLink } from "@/components/photo-link";
 import { PhotoBar } from "@/components/photo-bar";
-
-export function generateStaticParams() {
-  return photos.map((photo) => ({
-    id: String(photo.id),
-  }));
-}
 
 export async function generateMetadata({
   params,
@@ -20,18 +15,19 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const photo = getPhotoById(Number(id));
+  const photo = await getPhotoById(id);
 
   if (!photo) return {};
 
-  const title = `${photo.title} por ${photo.photographer}`;
+  const displayTitle = photo.title ?? "sin titulo";
+  const title = `${displayTitle} por ${photo.user.name}`;
 
   return {
     title,
     description: photo.description,
     openGraph: {
       title,
-      description: photo.description,
+      description: photo.description ?? undefined,
     },
   };
 }
@@ -42,14 +38,20 @@ export default async function PhotoPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const photo = getPhotoById(Number(id));
+  const currentUser = await getSessionUser();
+  const photo = await getPhotoById(id, currentUser?.id);
 
   if (!photo) {
     notFound();
   }
 
   const isPortrait = photo.height > photo.width;
-  const otherPhotos = photos.filter((p) => p.id !== photo.id);
+  const { photos: otherPhotos } = await getRecentPhotos(
+    currentUser?.id,
+    undefined,
+    20,
+  );
+  const filtered = otherPhotos.filter((p) => p.id !== photo.id);
 
   return (
     <>
@@ -63,8 +65,8 @@ export default async function PhotoPage({
         >
           <ViewTransition name={`photo-${photo.id}`} share="image-expand" enter="vt-fade" exit="vt-fade">
             <Image
-              src={getPhotoUrl(photo)}
-              alt={photo.title}
+              src={photo.url}
+              alt={photo.title ?? "sin titulo"}
               width={photo.width}
               height={photo.height}
               sizes={isPortrait ? "(min-width: 1024px) 60vw, 100vw" : "100vw"}
@@ -79,19 +81,23 @@ export default async function PhotoPage({
 
         <ViewTransition enter="vt-fade" exit="vt-fade">
           <div className="px-4 py-8">
-            <h1 className="text-xl font-light">{photo.title}</h1>
+            <h1 className="text-xl font-light">
+              {photo.title ?? <span className="italic text-muted">sin titulo</span>}
+            </h1>
             <Link
-              href={`/profile/${photo.username}`}
+              href={`/profile/${photo.user.username}`}
               className="text-sm italic text-muted hover:text-foreground transition-colors"
             >
-              {photo.photographer}
+              {photo.user.name}
             </Link>
-            <p className="mt-3 text-sm text-muted">{photo.description}</p>
+            {photo.description && (
+              <p className="mt-3 text-sm text-muted">{photo.description}</p>
+            )}
           </div>
         </ViewTransition>
 
         <div className="columns-2 sm:columns-3 lg:columns-4 gap-1">
-          {otherPhotos.map((p) => (
+          {filtered.map((p) => (
             <PhotoLink
               key={p.id}
               photo={p}
@@ -108,8 +114,8 @@ export default async function PhotoPage({
                 exit="vt-fade"
               >
                 <BlurImage
-                  src={getPhotoUrl(p)}
-                  alt={p.title}
+                  src={p.url}
+                  alt={p.title ?? "sin titulo"}
                   width={p.width}
                   height={p.height}
                   sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"

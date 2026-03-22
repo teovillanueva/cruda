@@ -1,0 +1,1 @@
+ALTER TABLE "photo" ALTER COLUMN "title" DROP NOT NULL;

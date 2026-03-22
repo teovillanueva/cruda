@@ -28,27 +28,44 @@ export default async function Image() {
           alignItems: "center",
           justifyContent: "center",
           fontFamily: "Source Serif 4",
-          gap: 12,
+          gap: 24,
         }}
       >
-        <span
+        <svg
+          width={42}
+          height={60}
+          viewBox="0 0 70 100"
+          fill="#ededed"
+        >
+          <path d="M35 0 C36 36, 44 46, 70 50 C44 54, 36 64, 35 100 C34 64, 26 54, 0 50 C26 46, 34 36, 35 0Z" />
+        </svg>
+        <div
           style={{
-            fontSize: 72,
-            color: "#ededed",
-            fontStyle: "italic",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 12,
           }}
         >
-          cruda
-        </span>
-        <span
-          style={{
-            fontSize: 28,
-            color: "#ededed",
-            opacity: 0.6,
-          }}
-        >
-          filosofía
-        </span>
+          <span
+            style={{
+              fontSize: 72,
+              color: "#ededed",
+              fontStyle: "italic",
+            }}
+          >
+            cruda
+          </span>
+          <span
+            style={{
+              fontSize: 28,
+              color: "#ededed",
+              opacity: 0.6,
+            }}
+          >
+            filosofía
+          </span>
+        </div>
       </div>
     ),
     {

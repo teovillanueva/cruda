@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { FloatingBar } from "@/components/floating-bar";
 import { AuthQuote } from "@/components/auth-quote";
 import { authClient } from "@/lib/auth-client";
+import { Logo } from "@/components/logo";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -43,9 +44,12 @@ export default function RegisterPage() {
       <ViewTransition enter="vt-fade" exit="vt-fade">
         <div className="min-h-dvh flex items-center justify-center px-4">
           <div className="w-full max-w-sm space-y-8">
-            <div className="space-y-2">
-              <h1 className="text-2xl font-serif">unite</h1>
-              <AuthQuote />
+            <div className="space-y-4">
+              <Logo size={28} />
+              <div className="space-y-2">
+                <h1 className="text-2xl font-serif">unite</h1>
+                <AuthQuote />
+              </div>
             </div>
 
             <form id="register-form" className="space-y-5" onSubmit={handleSubmit}>

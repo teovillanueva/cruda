@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Source_Serif_4 } from "next/font/google";
 import { AuthProvider } from "@/lib/auth-context";
-import { SocialProvider } from "@/lib/social-context";
+import { QueryProvider } from "@/lib/query-provider";
 import { ScrollBackground } from "@/components/scroll-bg";
 import "./globals.css";
 
@@ -25,12 +25,12 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${sourceSerif.variable} h-full antialiased`}>
       <body className="min-h-full font-serif">
-        <AuthProvider>
-          <SocialProvider>
+        <QueryProvider>
+          <AuthProvider>
             <ScrollBackground />
             {children}
-          </SocialProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );

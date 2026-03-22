@@ -7,7 +7,12 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "./auth-client";
-import type { User } from "./mock-data";
+
+export interface User {
+  id: string;
+  username: string;
+  name: string;
+}
 
 interface AuthContextValue {
   user: User | null;
@@ -24,6 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const user: User | null =
     session?.user
       ? {
+          id: session.user.id,
           username: (session.user as { username?: string }).username ?? session.user.name,
           name: session.user.name,
         }

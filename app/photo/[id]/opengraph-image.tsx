@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { getPhotoById } from "@/lib/mock-data";
+import { getPhotoById } from "@/lib/queries";
 
 export const alt = "cruda";
 export const size = {
@@ -14,7 +14,7 @@ export default async function Image({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const photo = getPhotoById(Number(id));
+  const photo = await getPhotoById(id);
 
   if (!photo) {
     return new ImageResponse(
@@ -70,9 +70,11 @@ export default async function Image({
               fontSize: 52,
               color: "#ededed",
               lineClamp: 2,
+              fontStyle: photo.title ? "normal" : "italic",
+              opacity: photo.title ? 1 : 0.5,
             }}
           >
-            {photo.title}
+            {photo.title ?? "sin titulo"}
           </span>
           <span
             style={{
@@ -82,7 +84,7 @@ export default async function Image({
               fontStyle: "italic",
             }}
           >
-            {photo.photographer}
+            {photo.user.name}
           </span>
           <span
             style={{
@@ -95,16 +97,15 @@ export default async function Image({
             {photo.description}
           </span>
         </div>
-        <span
-          style={{
-            fontSize: 28,
-            color: "#ededed",
-            opacity: 0.3,
-            fontStyle: "italic",
-          }}
+        <svg
+          width={21}
+          height={30}
+          viewBox="0 0 70 100"
+          fill="#ededed"
+          opacity={0.3}
         >
-          cruda
-        </span>
+          <path d="M35 0 C36 36, 44 46, 70 50 C44 54, 36 64, 35 100 C34 64, 26 54, 0 50 C26 46, 34 36, 35 0Z" />
+        </svg>
       </div>
     ),
     {

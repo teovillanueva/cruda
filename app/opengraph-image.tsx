@@ -20,11 +20,21 @@ export default async function Image() {
           width: "100%",
           height: "100%",
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           fontFamily: "Source Serif 4",
+          gap: 24,
         }}
       >
+        <svg
+          width={42}
+          height={60}
+          viewBox="0 0 70 100"
+          fill="#ededed"
+        >
+          <path d="M35 0 C36 36, 44 46, 70 50 C44 54, 36 64, 35 100 C34 64, 26 54, 0 50 C26 46, 34 36, 35 0Z" />
+        </svg>
         <span
           style={{
             fontSize: 72,

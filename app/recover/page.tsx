@@ -6,6 +6,7 @@ import Link from "next/link";
 import { FloatingBar } from "@/components/floating-bar";
 import { AuthQuote } from "@/components/auth-quote";
 import { authClient } from "@/lib/auth-client";
+import { Logo } from "@/components/logo";
 
 export default function RecoverPage() {
   const [email, setEmail] = useState("");
@@ -36,9 +37,12 @@ export default function RecoverPage() {
       <ViewTransition enter="vt-fade" exit="vt-fade">
         <div className="min-h-dvh flex items-center justify-center px-4">
           <div className="w-full max-w-sm space-y-8">
-            <div className="space-y-2">
-              <h1 className="text-2xl font-serif">no pasa nada</h1>
-              <AuthQuote />
+            <div className="space-y-4">
+              <Logo size={28} />
+              <div className="space-y-2">
+                <h1 className="text-2xl font-serif">no pasa nada</h1>
+                <AuthQuote />
+              </div>
             </div>
 
             {sent ? (

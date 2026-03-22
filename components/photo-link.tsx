@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useRef, type ReactNode } from "react";
 import { getImageProps } from "next/image";
-import { getPhotoUrl, type Photo } from "@/lib/mock-data";
+import type { PhotoWithUser } from "@/lib/types";
 
 export function PhotoLink({
   photo,
@@ -11,7 +11,7 @@ export function PhotoLink({
   className,
   transitionTypes,
 }: {
-  photo: Photo;
+  photo: PhotoWithUser;
   children: ReactNode;
   className?: string;
   transitionTypes?: string[];
@@ -25,7 +25,7 @@ export function PhotoLink({
     const isPortrait = photo.height > photo.width;
     const { props: imgProps } = getImageProps({
       alt: "",
-      src: getPhotoUrl(photo),
+      src: photo.url,
       width: photo.width,
       height: photo.height,
       sizes: isPortrait ? "(min-width: 1024px) 60vw, 100vw" : "100vw",
