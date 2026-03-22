@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import * as Dialog from "@radix-ui/react-dialog";
 import { FloatingBar } from "@/components/floating-bar";
 import { BackLink } from "@/components/back-link";
 import { UploadZone } from "@/components/upload-zone";
@@ -41,6 +42,7 @@ export default function UploadPage() {
   const upload = useUploadPhoto();
   const [entries, setEntries] = useState<FileEntry[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   if (!user) {
     router.replace("/login");
@@ -63,17 +65,24 @@ export default function UploadPage() {
     setEntries((prev) => [...prev, ...newEntries]);
   }, []);
 
+  const removeEntry = (index: number) => {
+    setEntries((prev) => {
+      const entry = prev[index];
+      URL.revokeObjectURL(entry.preview);
+      return prev.filter((_, i) => i !== index);
+    });
+  };
+
   const handleUpload = async () => {
     setUploading(true);
-    const results: { index: number; photoId: string }[] = [];
 
-    for (let i = 0; i < entries.length; i++) {
-      const entry = entries[i];
-      if (entry.status === "done") continue;
+    // Mark all pending as uploading
+    setEntries((prev) =>
+      prev.map((e) => (e.status === "pending" ? { ...e, status: "uploading" } : e)),
+    );
 
-      setEntries((prev) =>
-        prev.map((e, idx) => (idx === i ? { ...e, status: "uploading" } : e)),
-      );
+    const promises = entries.map(async (entry, i) => {
+      if (entry.status === "done") return null;
 
       try {
         const photo = await upload.mutateAsync({
@@ -81,22 +90,25 @@ export default function UploadPage() {
           width: entry.width,
           height: entry.height,
         });
-        results.push({ index: i, photoId: photo.id });
         setEntries((prev) =>
           prev.map((e, idx) =>
             idx === i ? { ...e, status: "done", photoId: photo.id } : e,
           ),
         );
+        return photo.id;
       } catch {
         setEntries((prev) =>
           prev.map((e, idx) => (idx === i ? { ...e, status: "error" } : e)),
         );
+        return null;
       }
-    }
+    });
+
+    const results = await Promise.all(promises);
 
     setUploading(false);
 
-    const uploadedIds = results.map((r) => r.photoId);
+    const uploadedIds = results.filter((id): id is string => id !== null);
     if (uploadedIds.length === 1) {
       router.push(`/photo/${uploadedIds[0]}/edit`);
     } else if (uploadedIds.length > 1) {
@@ -108,23 +120,31 @@ export default function UploadPage() {
 
   const hasFiles = entries.length > 0;
   const allDone = entries.length > 0 && entries.every((e) => e.status === "done");
+  const lightboxEntry = lightboxIndex !== null ? entries[lightboxIndex] : null;
 
   return (
     <>
-      <div className="px-4 pt-8 pb-24">
+      <div className="p-1 pb-24">
         {!hasFiles ? (
-          <UploadZone onFiles={handleFiles} disabled={uploading} />
+          <div className="px-3 pt-7">
+            <UploadZone onFiles={handleFiles} disabled={uploading} />
+          </div>
         ) : (
-          <div className="space-y-6">
-            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-1">
+          <>
+            <div className="columns-2 sm:columns-3 lg:columns-4 gap-1">
               {entries.map((entry, i) => (
-                <div key={i} className="relative aspect-square overflow-hidden">
+                <div
+                  key={i}
+                  className="relative mb-1 break-inside-avoid group cursor-pointer"
+                  onClick={() => setLightboxIndex(i)}
+                >
                   <Image
                     src={entry.preview}
                     alt=""
-                    fill
-                    className="object-cover"
-                    sizes="(min-width: 1024px) 20vw, (min-width: 640px) 25vw, 33vw"
+                    width={entry.width}
+                    height={entry.height}
+                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+                    className="w-full h-auto block transition-opacity duration-300 group-hover:opacity-90"
                   />
                   {entry.status === "uploading" && (
                     <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
@@ -139,36 +159,79 @@ export default function UploadPage() {
                       <span className="text-xs text-red-400">error</span>
                     </div>
                   )}
+                  {entry.status === "pending" && !uploading && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeEntry(i);
+                      }}
+                      className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/50 text-white/80 hover:bg-black/70 hover:text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+                    >
+                      &times;
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
 
-            {!allDone && (
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={handleUpload}
-                  disabled={uploading}
-                  className="text-sm text-muted hover:text-foreground transition-colors disabled:opacity-50"
-                >
-                  {uploading ? "subiendo..." : "subir"}
-                </button>
-                {!uploading && (
+            <div className="px-3 mt-6 flex flex-col gap-6">
+              {!allDone && (
+                <div className="flex items-center gap-4">
                   <button
-                    onClick={() => setEntries([])}
-                    className="text-sm text-foreground/30 hover:text-foreground/60 transition-colors"
+                    onClick={handleUpload}
+                    disabled={uploading}
+                    className="text-sm text-muted hover:text-foreground transition-colors disabled:opacity-50"
                   >
-                    cancelar
+                    {uploading ? "subiendo..." : `subir ${entries.length} ${entries.length === 1 ? "foto" : "fotos"}`}
                   </button>
-                )}
-              </div>
-            )}
+                  {!uploading && (
+                    <button
+                      onClick={() => {
+                        entries.forEach((e) => URL.revokeObjectURL(e.preview));
+                        setEntries([]);
+                      }}
+                      className="text-sm text-foreground/30 hover:text-foreground/60 transition-colors"
+                    >
+                      cancelar
+                    </button>
+                  )}
+                </div>
+              )}
 
-            {!uploading && !allDone && (
-              <UploadZone onFiles={handleFiles} />
-            )}
-          </div>
+              {!uploading && !allDone && (
+                <UploadZone onFiles={handleFiles} />
+              )}
+            </div>
+          </>
         )}
       </div>
+
+      <Dialog.Root
+        open={lightboxIndex !== null}
+        onOpenChange={(open) => { if (!open) setLightboxIndex(null); }}
+      >
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm data-[state=open]:animate-[modal-overlay-in_200ms_ease-out] data-[state=closed]:animate-[modal-overlay-out_150ms_ease-in]" />
+          <Dialog.Content className="fixed inset-0 z-[101] flex items-center justify-center p-4 data-[state=open]:animate-[modal-overlay-in_200ms_ease-out] data-[state=closed]:animate-[modal-overlay-out_150ms_ease-in]">
+            <Dialog.Title className="sr-only">Vista previa</Dialog.Title>
+            {lightboxEntry && (
+              <Image
+                src={lightboxEntry.preview}
+                alt=""
+                width={lightboxEntry.width}
+                height={lightboxEntry.height}
+                className="max-w-full max-h-[85vh] w-auto h-auto object-contain"
+                sizes="100vw"
+              />
+            )}
+            <Dialog.Close asChild>
+              <button className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white flex items-center justify-center transition-colors text-lg">
+                &times;
+              </button>
+            </Dialog.Close>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
 
       <FloatingBar>
         <BackLink />

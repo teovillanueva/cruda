@@ -69,6 +69,7 @@ export default async function PhotoPage({
               alt={photo.title ?? "sin titulo"}
               width={photo.width}
               height={photo.height}
+              quality={90}
               sizes={isPortrait ? "(min-width: 1024px) 60vw, 100vw" : "100vw"}
               className={`w-full h-auto block ${
                 isPortrait ? "lg:w-auto lg:max-h-[85vh]" : ""
