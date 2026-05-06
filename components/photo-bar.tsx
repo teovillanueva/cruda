@@ -51,7 +51,10 @@ export function PhotoBar({ photoId }: { photoId: string }) {
                 onClick={() => {
                   saveToggle.mutate(photoId, {
                     onSuccess: (data) => {
-                      posthog.capture(data.saved ? "photo_saved" : "photo_unsaved", { photo_id: photoId });
+                      posthog.capture(
+                        data.saved ? "photo_saved" : "photo_unsaved",
+                        { photo_id: photoId },
+                      );
                     },
                   });
                 }}
@@ -71,7 +74,7 @@ export function PhotoBar({ photoId }: { photoId: string }) {
           href="/"
           className="text-sm italic tracking-wide whitespace-nowrap text-foreground/80 hover:text-foreground transition-colors"
         >
-          cruda
+          home
         </Link>
       </FloatingBar>
 

@@ -3,6 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { username } from "better-auth/plugins";
 import { db } from "./db";
 import { dash } from "@better-auth/infra";
+import { sendResetPasswordEmail } from "./email";
 
 function getBaseURL() {
   if (process.env.BETTER_AUTH_URL) return process.env.BETTER_AUTH_URL;
@@ -18,7 +19,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     sendResetPassword: async ({ user, url }) => {
-      console.log(`[auth] Reset password for ${user.email}: ${url}`);
+      void sendResetPasswordEmail({ to: user.email, url });
     },
   },
   plugins: [username(), dash()],

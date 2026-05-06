@@ -68,7 +68,10 @@ export function ProfileBar({
             onClick={() => {
               followToggle.mutate(userId, {
                 onSuccess: (data) => {
-                  posthog.capture(data.followed ? "user_followed" : "user_unfollowed", { followed_user_id: userId, followed_username: username });
+                  posthog.capture(
+                    data.followed ? "user_followed" : "user_unfollowed",
+                    { followed_user_id: userId, followed_username: username },
+                  );
                 },
               });
             }}
@@ -87,7 +90,7 @@ export function ProfileBar({
         href="/"
         className="text-sm italic tracking-wide whitespace-nowrap text-foreground/80 hover:text-foreground transition-colors"
       >
-        cruda
+        home
       </Link>
     </FloatingBar>
   );
