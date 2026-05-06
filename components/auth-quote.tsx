@@ -5,9 +5,7 @@ import { useState, useEffect } from "react";
 const quotes = [
   "sin algoritmos, sin métricas",
   "compartí arte, no contenido",
-  "la foto importa, el número no",
   "un espacio sin ruido",
-  "fotografía por amor",
 ];
 
 export function AuthQuote() {
