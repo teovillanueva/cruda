@@ -1,10 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 import { useAuth } from "@/lib/auth-context";
 
 export default function MasPage() {
   const { user, logout } = useAuth();
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   return (
     <div className="min-h-dvh flex items-center justify-center">
@@ -21,6 +27,19 @@ export default function MasPage() {
         >
           filosofía
         </Link>
+        <Link
+          href="https://github.com/teovillanueva/cruda"
+          className="text-foreground/80 hover:text-foreground transition-colors"
+        >
+          código
+        </Link>
+        <button
+          onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+          className="text-foreground/80 hover:text-foreground transition-colors"
+          suppressHydrationWarning
+        >
+          {mounted ? (resolvedTheme === "dark" ? "claro" : "oscuro") : "tema"}
+        </button>
         {user && (
           <button
             onClick={logout}

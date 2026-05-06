@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #fafafa;
   --background-scroll: #f3f3f3;
@@ -8,22 +10,20 @@
   --border: #e5e5e5;
 }
 
+:root.dark {
+  --background: #0a0a0a;
+  --background-scroll: #181818;
+  --foreground: #ededed;
+  --muted: #666;
+  --border: #222;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-border: var(--border);
   --font-serif: var(--font-source-serif);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --background-scroll: #181818;
-    --foreground: #ededed;
-    --muted: #666;
-    --border: #222;
-  }
 }
 
 body {
